@@ -3,36 +3,53 @@
 from __future__ import print_function
 from __future__ import division
 
-from tensor2tensor.data_generators import translate_envi
+from tensor2tensor.data_generators import problem
+from tensor2tensor.data_generators import translate
 from tensor2tensor.utils import registry
 
-
-# End-of-sentence marker.
-EOS = translate_envi.EOS
-
-# For English-Vietnamese the IWSLT'15 corpus
-# from https://nlp.stanford.edu/projects/nmt/ is used.
-# The original dataset has 133K parallel sentences.
-_VIEN_TRAIN_DATASETS = [[
-    "https://github.com/stefan-it/nmt-en-vi/raw/master/data/train-en-vi.tgz",  # pylint: disable=line-too-long
-    ("train.vi", "train.en")
-]]
-
-# For development 1,553 parallel sentences are used.
-_VIEN_TEST_DATASETS = [[
-    "https://github.com/stefan-it/nmt-en-vi/raw/master/data/dev-2012-en-vi.tgz",  # pylint: disable=line-too-long
-    ("tst2012.vi", "tst2012.en")
-]]
+import unidecode
 
 
 @registry.register_problem
-class TranslateVienIwslt32k(translate_envi.TranslateEnviIwslt32k):
+class TranslateVivi(translate.TranslateProblem):
   """Problem spec for IWSLT'15 En-Vi translation."""
 
   @property
   def approx_vocab_size(self):
     return 2**15  # 32768
 
-  def source_data_files(self, dataset_split):
-    train = dataset_split == translate_envi.problem.DatasetSplit.TRAIN
-    return _VIEN_TRAIN_DATASETS if train else _VIEN_TEST_DATASETS
+  @property
+  def dataset_splits(self):
+    """Splits of data to produce and number of output shards for each."""
+    # 10% evaluation data
+    return [{
+        "split": problem.DatasetSplit.TRAIN,
+        "shards": 9,
+    }, {
+        "split": problem.DatasetSplit.EVAL,
+        "shards": 1,
+    }]
+
+  @property
+  def is_generate_per_split(self):
+    return True  
+
+  def generate_samples(self, data_dir, tmp_dir, dataset_split):
+    vn = 'aáàảãạăắằẳẵặâấầẩẫậeéèẻẽẹêếềểễệiíìỉĩịoóòỏõọôốồổỗộơớờởỡợuúùủũụưứừửữựyýỳỷỹỵdđ'
+    aeiouyd = ['a', 'e', 'i', 'o', 'u', 'y', 'd']
+    legal = ' !"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ{|}~'
+    punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+    train_data = "%s/train.txt" % data_dir
+    with open(train_data, 'r') as f:
+    lines = f.readlines()
+    for line in lines:
+        line = line.strip().lower()
+        line = ''.join(c if c not in punct else '-' for c in line)  # replace all punctuations with '-'
+        line = ''.join(c if c in legal else '?' for c in line)  # replace unknown characters with '?'
+        line_no_tone = unidecode.unidecode(line)
+        if len(line) <= 300:
+          yield {
+              "inputs": line_no_tone,
+              "targets": line,
+          }          
+
