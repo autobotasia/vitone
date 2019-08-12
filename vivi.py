@@ -49,13 +49,11 @@ if __name__ == '__main__':
 
   data_dir = FLAGS.vivi_data_dir,
   problem_name = FLAGS.vivi_problem,
-  ckpt = FLAGS.vivi_ckpt
-
-  print("%s %s %s" % (data_dir, problem_name, ckpt))
+  ckpt_path = FLAGS.vivi_ckpt
 
   # Convert directory into checkpoints
-  if tf.io.gfile.isdir(ckpt):
-    ckpt = tf.train.latest_checkpoint(ckpt)
+  if tf.io.gfile.isdir(ckpt_path):
+    ckpt_path = tf.train.latest_checkpoint(ckpt_path)
 
   # For back translation, we need a temporary file in the other language
   # before back-translating into the source language.
@@ -64,10 +62,12 @@ if __name__ == '__main__':
   )
 
   if FLAGS.vivi_interactively:
-    decoding.vivi_interactively(problem_name, data_dir, ckpt)
+    print("%s %s %s" % (data_dir, problem_name, ckpt_path))
+    #decoding.vivi_interactively(problem_name, data_dir, ckpt_path)
+    decoding.vivi_interactively('translate_vivi', './data/translate_vivi', ckpt_path)
   else:
     # Step 1: Translating from source language to the other language.
     if not tf.io.gfile.exists(tmp_file):
       decoding.t2t_decoder(problem_name, data_dir,
                          FLAGS.paraphrase_from_file, tmp_file,
-                         ckpt)
+                         ckpt_path)

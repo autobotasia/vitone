@@ -57,9 +57,9 @@ def create_hp_and_estimator(problem_name, data_dir, checkpoint_path):
   return hp, decode_hp, estimator
 
 
-def vivi_interactively(problem_name, data_dir, ckpt):
+def vivi_interactively(problem_name, data_dir, ckpt_path):
   hp, decode_hp, estimator = create_hp_and_estimator(
-    problem_name, data_dir, ckpt)
+    problem_name, data_dir, ckpt_path)
   
   def interactive_text_input():
     while True:
@@ -75,7 +75,7 @@ def vivi_interactively(problem_name, data_dir, ckpt):
 
   outputs = decode_interactively(
     estimator, interactive_text_input(), 
-    problem, hp, decode_hp, ckpt)
+    problem_name, hp, decode_hp, ckpt_path)
 
   for output in outputs:
     print('Paraphrased: {}'.format(output.replace('&apos;', "'")))
@@ -129,7 +129,6 @@ def decode_interactively(estimator,
     ).batch(1)
 
   result_iter = estimator.predict(input_fn, checkpoint_path=checkpoint_path)
-
   for result in result_iter:
     _, decoded_outputs, _ = decoding.log_decode_results(
         result["inputs"],
