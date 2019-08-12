@@ -27,7 +27,7 @@ while [ "$1" != "" ]; do
                                 --model=$model_name \
                                 --hparams_set=$hparams_set \
                                 --hparams='batch_size=1024' \
-                                --train_steps=1000 \
+                                --train_steps=1000000 \
                                 --eval_steps=10 \
                                 --problem=$problem_name \
                                 --data_dir=$data_dir \

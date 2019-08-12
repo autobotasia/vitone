@@ -43,18 +43,19 @@ class TranslateVivi(text_problems.Text2TextProblem):
     #aeiouyd = ['a', 'e', 'i', 'o', 'u', 'y', 'd']
     legal = ' !"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ{|}~'
     punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    train_data = "%s/train.txt" % data_dir
-    #train_data = "%s/corpus-full.txt" % data_dir
-    with open(train_data, 'r') as f:
-      lines = f.readlines()
-      for line in lines:
-          line = line.strip().lower()
-          line = ''.join(c if c not in punct else '-' for c in line)  # replace all punctuations with '-'
-          line = ''.join(c if c in legal else '?' for c in line)  # replace unknown characters with '?'
-          line_no_tone = unidecode.unidecode(line)
-          if len(line) <= 300:
-            yield {
-                "inputs": line_no_tone,
-                "targets": line,
-            }
+    for index in range(10):
+      #train_data = "%s/train.txt" % data_dir
+      train_data = "%s/corpus-full-%d.txt" % (data_dir, index)
+      with open(train_data, 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            line = line.strip().lower()
+            line = ''.join(c if c not in punct else '-' for c in line)  # replace all punctuations with '-'
+            line = ''.join(c if c in legal else '?' for c in line)  # replace unknown characters with '?'
+            line_no_tone = unidecode.unidecode(line)
+            if len(line) <= 300:
+              yield {
+                  "inputs": line_no_tone,
+                  "targets": line,
+              }
 
