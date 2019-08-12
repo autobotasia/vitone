@@ -32,7 +32,7 @@ class TranslateVivi(text_problems.Text2TextProblem):
 
   @property
   def is_generate_per_split(self):
-    return True  
+    return False  
 
   def generate_samples(self, data_dir, tmp_dir, dataset_split):
     #del data_dir
@@ -43,7 +43,7 @@ class TranslateVivi(text_problems.Text2TextProblem):
     #aeiouyd = ['a', 'e', 'i', 'o', 'u', 'y', 'd']
     legal = ' !"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ{|}~'
     punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-    train_data = "%s/train_data.txt" % data_dir
+    train_data = "%s/train.txt" % data_dir
     with open(train_data, 'r') as f:
       lines = f.readlines()
       for line in lines:
