@@ -25,7 +25,7 @@ tf.flags.DEFINE_string(
     'Data directory for Vietnamese to English translation.')
 tf.flags.DEFINE_string(
     'vivi_ckpt', 
-    './output/translate_vivi/avg/', 
+    './checkpoints/translate_vivi', 
     'Pretrain checkpoint directory for Vietnamese to English translation.')
 tf.flags.DEFINE_string(
     'paraphrase_from_file', 

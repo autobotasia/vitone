@@ -44,6 +44,7 @@ class TranslateVivi(text_problems.Text2TextProblem):
     legal = ' !"#$%&\'()*+,-./0123456789:;<=>?@[\\]^_`abcdefghijklmnopqrstuvwxyzáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ{|}~'
     punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
     train_data = "%s/train.txt" % data_dir
+    #train_data = "%s/corpus-full.txt" % data_dir
     with open(train_data, 'r') as f:
       lines = f.readlines()
       for line in lines:

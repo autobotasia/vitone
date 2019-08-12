@@ -1,10 +1,10 @@
 # Create hparams and the model
 model_name=transformer
-hparams_set=transformer_tiny
+hparams_set=transformer_base
 problem_name=translate_vivi
 data_dir=./data/$problem_name
 tmp_dir=/tmp/$problem_name
-ckpt_path=./checkpoints/$problem_name/avg
+ckpt_path=./checkpoints/$problem_name
 decode_hparams="beam_size=4,alpha=0.6"
 
  export CUDA_VISIBLE_DEVICES=0,1
