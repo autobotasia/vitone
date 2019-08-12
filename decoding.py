@@ -57,11 +57,9 @@ def create_hp_and_estimator(problem_name, data_dir, checkpoint_path):
   return hp, decode_hp, estimator
 
 
-def vivi_interactively(
-    problem, data_dir, ckpt):
-  
+def vivi_interactively(problem_name, data_dir, ckpt):
   hp, decode_hp, estimator = create_hp_and_estimator(
-      problem, data_dir, ckpt)
+    problem_name, data_dir, ckpt)
   
   def interactive_text_input():
     while True:
@@ -188,8 +186,8 @@ def decode_from_text_file(estimator,
   # Check for decoding checkpoint.
   decodes = []
   shuffle_file_path = decode_filename + '.shuffle.txt'
-  if tf.gfile.Exists(shuffle_file_path):
-    with tf.gfile.Open(shuffle_file_path, 'r') as f:
+  if tf.io.gfile.exists(shuffle_file_path):
+    with tf.io.gfile.GFile(shuffle_file_path, 'r') as f:
       decodes = [line.strip() for line in f.readlines()]
     tf.logging.info('Read {} sentences from checkpoint.'.format(len(decodes)))
 
@@ -253,8 +251,8 @@ def decode_from_text_file(estimator,
       except StopIteration:
         break
 
-  writing_mode = 'a' if tf.gfile.Exists(shuffle_file_path) else 'w'
-  shuffle_file = tf.gfile.Open(shuffle_file_path, writing_mode)
+  writing_mode = 'a' if tf.io.gfile.exists(shuffle_file_path) else 'w'
+  shuffle_file = tf.io.gfile.GFile(shuffle_file_path, writing_mode)
   count = 0
   for elapsed_time, result in timer(result_iter):
     if decode_hp.return_beams:
@@ -311,7 +309,7 @@ def decode_from_text_file(estimator,
           count, len(sorted_inputs)))
       shuffle_file.flush()
       shuffle_file.close()
-      shuffle_file = tf.gfile.Open(shuffle_file_path, 'a')
+      shuffle_file = tf.io.gfile.GFile(shuffle_file_path, 'a')
 
     total_time_per_step += elapsed_time
     total_cnt += result["outputs"].shape[-1]
@@ -321,7 +319,7 @@ def decode_from_text_file(estimator,
     shuffle_file.write('\n')
 
   # Write the final output to file.
-  outfile = tf.gfile.Open(decode_filename, "w")
+  outfile = tf.io.gfile.GFile(decode_filename, "w")
   for index in range(len(all_sorted_inputs)):
     outfile.write("%s%s" % (decodes[sorted_keys[index]], 
                             decode_hp.delimiter))

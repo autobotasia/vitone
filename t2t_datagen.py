@@ -11,4 +11,4 @@ import tensorflow as tf
 
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)
-  tf.app.run(t2t_datagen.main)
+  tf.compat.v1.app.run(t2t_datagen.main)

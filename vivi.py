@@ -21,11 +21,11 @@ tf.flags.DEFINE_string(
     'Problem name for Vietnamese (notone) to Vietnamese translation.')
 tf.flags.DEFINE_string(
     'vivi_data_dir', 
-    './vivi-translation/data/translate_vivi', 
+    './data/translate_vivi', 
     'Data directory for Vietnamese to English translation.')
 tf.flags.DEFINE_string(
     'vivi_ckpt', 
-    './vivi-translation/checkpoints/translate_vivi/avg/', 
+    './output/translate_vivi/avg/', 
     'Pretrain checkpoint directory for Vietnamese to English translation.')
 tf.flags.DEFINE_string(
     'paraphrase_from_file', 
@@ -47,9 +47,15 @@ FLAGS = tf.flags.FLAGS
 if __name__ == '__main__':
   tf.logging.set_verbosity(tf.logging.INFO)
 
+  data_dir = FLAGS.vivi_data_dir,
+  problem_name = FLAGS.vivi_problem,
+  ckpt = FLAGS.vivi_ckpt
+
+  print("%s %s %s" % (data_dir, problem_name, ckpt))
+
   # Convert directory into checkpoints
-  if tf.gfile.IsDirectory(vivi_ckpt):
-    vivi_ckpt = tf.train.latest_checkpoint(vivi_ckpt)
+  if tf.io.gfile.isdir(ckpt):
+    ckpt = tf.train.latest_checkpoint(ckpt)
 
   # For back translation, we need a temporary file in the other language
   # before back-translating into the source language.
@@ -57,15 +63,11 @@ if __name__ == '__main__':
       '{}.tmp.vivi.txt'.format(FLAGS.paraphrase_from_file)
   )
 
-  data_dir = FLAGS.vivi_data_dir,
-  problem = FLAGS.vivi_problem,
-  ckpt = FLAGS.vivi_ckpt
-
   if FLAGS.vivi_interactively:
-    decoding.vivi_interactively(problem, data_dir, ckpt)
-
-  # Step 1: Translating from source language to the other language.
-  if not tf.gfile.Exists(tmp_file):
-    decoding.t2t_decoder(problem, data_dir,
+    decoding.vivi_interactively(problem_name, data_dir, ckpt)
+  else:
+    # Step 1: Translating from source language to the other language.
+    if not tf.io.gfile.exists(tmp_file):
+      decoding.t2t_decoder(problem_name, data_dir,
                          FLAGS.paraphrase_from_file, tmp_file,
                          ckpt)
