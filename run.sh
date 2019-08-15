@@ -7,7 +7,7 @@ tmp_dir=/tmp/$problem_name
 ckpt_path=./checkpoints/$problem_name
 decode_hparams="beam_size=4,alpha=0.6"
 
- export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=0,1
 
 usage()
 {
@@ -34,7 +34,13 @@ while [ "$1" != "" ]; do
                                 --output_dir=$ckpt_path \
                                 --worker_gpu=2 \
                                 ;;
-	-p | --predict )    echo "Start to run decoder"
+        -a | --avg_checkpoints ) echo "Start generate avg checkpoints"
+                            python3 ./utils/avg_checkpoints.py \
+                                --checkpoints=$ckpt_path \
+                                --num_last_checkpoints=100000 \
+                                --output_path=$ckpt_path/avg \
+                                ;;                        
+	    -p | --predict )    echo "Start to run decoder"
                             python3 ./vivi.py \
                                 --decode_hparams=$decode_hparams \
                                 --model=$model_name \
@@ -42,6 +48,7 @@ while [ "$1" != "" ]; do
                                 --vivi_data_dir=$data_dir \
                                 --vivi_problem=$problem_name \
                                 --vivi_ckpt=$ckpt_path \
+                                --avg_checkpoints 100000 \
                                 --vivi_interactively \
                                 ;;			
         -h | --help )           usage
