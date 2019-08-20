@@ -48,7 +48,6 @@ while [ "$1" != "" ]; do
                                 --vivi_data_dir=$data_dir \
                                 --vivi_problem=$problem_name \
                                 --vivi_ckpt=$ckpt_path \
-                                --avg_checkpoints 100000 \
                                 --vivi_interactively \
                                 ;;			
         -h | --help )           usage

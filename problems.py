@@ -49,7 +49,7 @@ class TranslateVivi(text_problems.Text2TextProblem):
       with open(train_data, 'r') as f:
         lines = f.readlines()
         for line in lines:
-            line = line.strip().lower()
+            line = line.strip()
             line = ''.join(c if c not in punct else '-' for c in line)  # replace all punctuations with '-'
             line = ''.join(c if c in legal else '?' for c in line)  # replace unknown characters with '?'
             line_no_tone = unidecode.unidecode(line)
