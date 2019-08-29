@@ -5,6 +5,7 @@ problem_name=translate_vivi
 data_dir=./data/$problem_name
 tmp_dir=/tmp/$problem_name
 ckpt_path=./checkpoints/$problem_name
+data_export=export
 decode_hparams="beam_size=4,alpha=0.6"
 
 export CUDA_VISIBLE_DEVICES=0,1
@@ -49,7 +50,29 @@ while [ "$1" != "" ]; do
                                 --vivi_problem=$problem_name \
                                 --vivi_ckpt=$ckpt_path \
                                 --vivi_interactively \
-                                ;;			
+                                ;;
+        -e | --export  )    echo "Start to export model"
+                            python3 t2t_exporter.py \
+                                --model=$model_name \
+                                --hparams_set=$hparams_set \
+                                --problem=$problem_name \
+                                --export_dir=$data_export \
+                                --output_dir=$ckpt_path \
+                                --data_dir=$data_dir
+                                ;; 
+        -s | --serving )    echo "Running server"
+                            tensorflow_model_server \
+                                --port 9000 \
+                                --model_name=$model_name \
+                                --model_base_path=/home/autobot/projects/autobot/transvivi/export \
+                                ;;
+        -q | --query    )   echo "Querying..."
+                            python3 t2t_query.py \
+                                --server=172.16.11.77:8500 \
+                                --servable_name=transformer \
+                                --problem=$problem_name \
+                                --data_dir=$data_dir \
+                                ;;                                                                               			
         -h | --help )           usage
                                 exit
                                 ;;
@@ -58,5 +81,3 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
-
-
