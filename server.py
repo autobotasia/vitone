@@ -2,10 +2,16 @@ import flask
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 import numpy as np
+import os
 import io
 import re
 import sys
 import json
+from tensor2tensor import problems as problems_lib
+from tensor2tensor.serving import serving_utils
+from tensor2tensor.utils import hparam
+from tensor2tensor.utils import registry
+import problems
 
 
 app = Flask(__name__)
@@ -50,23 +56,40 @@ class AuResult(JsonSerialize):
         self.matches = matches
         self.confidence = confident
 
+def make_request_fn():
+    """Returns a request function."""
+    request_fn = serving_utils.make_grpc_request_fn(
+        servable_name="vitone",
+        server="localhost:9000",
+        timeout_secs=10)
+    return request_fn
+
+
+problem = registry.problem("translate_vivi")
+hparams = hparam.HParams(data_dir=os.path.expanduser("./data/translate_vivi"))
+problem.get_hparams(hparams)
+request_fn = make_request_fn()
 
 @app.route('/check', methods=['POST']) 
 def face():
     replacements = []
     rules = []
     data = request.json
+    confident = 0
     for txt in data["text"]:
         text = txt["text"]
         offset = txt["offset"]
+        outputs = serving_utils.predict([text], problem, request_fn)
+        outputs, = outputs
+        output, confident = outputs
         rule = AuRule("MORFOLOGIK_RULE_EN_US", "Possible spelling mistake", "misspelling", None)
-        replacement = AuReplacement(text, text, offset, len(text), None)        
+        replacement = AuReplacement(text, output, offset, len(text), None)        
         rules.append(rule)
         replacements.append(replacement)
         #matches.append(match)
 
     matches = AuMatch("Tự động thêm dấu", "Tự động thêm dấu", replacements, rules)
-    ret = AuResult(AuLanguage("Vietnamese (Vi)", "vi-VN"), AuLanguage("Vietnamese (Vi)", "vi-VN"), matches, 0.9)    
+    ret = AuResult(AuLanguage("Vietnamese (Vi)", "vi-VN"), AuLanguage("Vietnamese (Vi)", "vi-VN"), matches, confident)    
     return ret.toJSON()
 
 
