@@ -12,6 +12,7 @@ from tensor2tensor.serving import serving_utils
 from tensor2tensor.utils import hparam
 from tensor2tensor.utils import registry
 import problems
+import unidecode
 
 
 app = Flask(__name__)
@@ -59,8 +60,8 @@ class AuResult(JsonSerialize):
 def make_request_fn():
     """Returns a request function."""
     request_fn = serving_utils.make_grpc_request_fn(
-        servable_name="vitone",
-        server="localhost:9000",
+        servable_name="transformer",
+        server="172.16.11.202:9000",
         timeout_secs=10)
     return request_fn
 
@@ -79,6 +80,9 @@ def face():
     for txt in data["text"]:
         text = txt["text"]
         offset = txt["offset"]
+        if unidecode.unidecode(text) == text:
+            continue
+
         outputs = serving_utils.predict([text], problem, request_fn)
         outputs, = outputs
         output, confident = outputs
@@ -89,7 +93,7 @@ def face():
         #matches.append(match)
 
     matches = AuMatch("Tự động thêm dấu", "Tự động thêm dấu", replacements, rules)
-    ret = AuResult(AuLanguage("Vietnamese (Vi)", "vi-VN"), AuLanguage("Vietnamese (Vi)", "vi-VN"), matches, confident)    
+    ret = AuResult(AuLanguage("Vietnamese (Vi)", "vi-VN"), AuLanguage("Vietnamese (Vi)", "vi-VN"), matches, '%f'%confident)    
     return ret.toJSON()
 
 

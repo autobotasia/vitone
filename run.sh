@@ -65,11 +65,11 @@ while [ "$1" != "" ]; do
                                 --rest_api_port=9001 \
                                 --port=9000 \
                                 --model_name=$model_name \
-                                --model_base_path=/home/autobot/projects/autobot/transvivi/export \
+                                --model_base_path=/home/autobot/projects/autobot/vitone/export \
                                 ;;
         -q | --query    )   echo "Querying..."
                             python3 t2t_query.py \
-                                --server=172.16.11.77:9000 \
+                                --server=172.16.11.202:9000 \
                                 --servable_name=transformer \
                                 --problem=$problem_name \
                                 --data_dir=$data_dir \
