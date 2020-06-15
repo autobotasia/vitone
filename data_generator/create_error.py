@@ -86,8 +86,8 @@ class Create_Error():
             text_new += char[l]+ " "
         return text_new
 
-f = open('Text.txt','r',encoding='utf-8') 
-with open('Text_rep.txt','a+',encoding='utf-8') as w:
+f = open('corpus-full-0.2.txt','r',encoding='utf-8') 
+with open('text-error.txt','a+',encoding='utf-8') as w:
 
     for i in range(100000):
         line_old = f.readline()
