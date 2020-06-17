@@ -26,7 +26,7 @@ def delete_acc(char):
     char = re.sub("ÝỲỶỴỸ","Y",char)
     char = re.sub("đ","d",char)
     char = re.sub("Đ","D",char)
-    return char 
+    return char
 
 def replace_all(text,dic):
     for m, l in dic.items():
@@ -37,7 +37,7 @@ class Create_Error():
 
     def __init__(self,text):
         self.text = text
-    
+
     def creat(self):
         char = self.text.split()
         #print(char)
@@ -58,7 +58,7 @@ class Create_Error():
                         char[i] = '*' + char[i] + '*'
                     i += 1
                     break
-            
+
                 if error_ph_am_1[j] in char[i]:
                     check = random.randint(1,10)
                     if check == 1:
@@ -86,7 +86,8 @@ class Create_Error():
             text_new += char[l]+ " "
         return text_new
 
-f = open('corpus-full-0.2.txt','r',encoding='utf-8') 
+
+f = open('corpus-full-0.2.txt','r',encoding='utf-8')
 with open('text-error.txt','a+',encoding='utf-8') as w:
 
     for i in range(100000):
@@ -95,4 +96,3 @@ with open('text-error.txt','a+',encoding='utf-8') as w:
         w.write(line_new)
         if i%10000 == 0:
             print('Process',i,'line')
-    
