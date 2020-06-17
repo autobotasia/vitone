@@ -93,5 +93,6 @@ with open('text-error.txt','a+',encoding='utf-8') as w:
         line_old = f.readline()
         line_new = Create_Error(line_old).creat() + '\n'
         w.write(line_new)
-        print(i)
+        if i%10000 == 0:
+            print('Process',i,'line')
     
