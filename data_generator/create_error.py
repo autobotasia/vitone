@@ -95,10 +95,3 @@ with open('text-error.txt','a+',encoding='utf-8') as w:
         line_old = f.readline()
         line_new = Create_Error(line_old).creat() + '\n'
         w.write(line_new)
-<<<<<<< HEAD
-        if i%10000 == 0:
-            print('Process',i,'line')
-=======
-        
-    
->>>>>>> 2c4b60b0962178ed7185eb88693032843a6be88f
