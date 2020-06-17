@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import random
+from tqdm import tqdm
 error_ng_am_1 = ['ả','ẩ','ẳ','ỏ','ổ','ở','ẻ','ể','ủ','ử','ỉ','ỷ']
 error_ng_am_2 = ['ã','ẫ','ẵ','õ','ỗ','ỡ','ẽ','ễ','ũ','ữ','ĩ','ỹ']
 error_ph_am_1 = ['ch','d','s','ch','d','s','ch','d','s','ch','d','s']
@@ -89,10 +90,9 @@ class Create_Error():
 f = open('corpus-full-0.2.txt','r',encoding='utf-8') 
 with open('text-error.txt','a+',encoding='utf-8') as w:
 
-    for i in range(100000):
+    for i in tqdm(range(100000)):
         line_old = f.readline()
         line_new = Create_Error(line_old).creat() + '\n'
         w.write(line_new)
-        if i%10000 == 0:
-            print('Process',i,'line')
+        
     
