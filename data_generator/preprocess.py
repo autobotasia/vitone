@@ -3,7 +3,7 @@ from vncorenlp import VnCoreNLP
 import random as rd
 import pickle
 import os
-
+import re
 
 
 
@@ -59,39 +59,100 @@ def random_delete_noun(sentence):
 def random_swap_words_in_sentence(paragraph):
 
     '''
-    input pattern example:
+    input pattern example (in error-sentences-token file):
     [['BS', '.'], ['CKI', 'Nguyễn_Tiến_Dũng', ',', 'Trưởng', 'khoa', 'Khám_chữa', 'bệnh', 'theo', 'yêu_cầu', ',', 'Trưởng', 'đơn_nguyên', 'Phẫu_thuật', 'thần_kinh', 'BVĐK', 'tỉnh', 'cho', 'biết', ':', 'Cháu', 'Trung', 'vào', 'viện', 'trong', 'tình_trạng', 'vô_cùng', 'nguy_kịch', ',', 'phẫu_thuật', 'xử_trí', 'các', 'tổn_thương', 'cần', 'cẩn_trọng', 'và', 'tuyệt_đối', 'chính_xác', '.']]
+
+    pattern of return value same as input
     '''
     assert type(paragraph) is list, "input of random_swap_words_in_sentence func should be 2D list of tokens"
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose paragraph of %s sentence to create error." % " ".join(paragraph[0]))
-        for sentence in paragraph:
-            
+
+    print("choose paragraph of %s sentence to create error." % " ".join(paragraph[0]))
+    for sentence in paragraph:
+        number_of_words_for_swap_opr = len(sentence) // 6
+        if number_of_words_for_swap_opr <= 1:
+            continue
+        word_indices = rd.sample(range(len(sentence)), number_of_words_for_swap_opr)
+        if number_of_words_for_swap_opr == 2:
+            # swap 2 words
+            sentence[word_indices[0]], sentence[word_indices[1]] = sentence[word_indices[1]], sentence[word_indices[0]]
+        else:
+            code_str_list = []
+            for index in word_indices:
+                code_str_list.append("sentence[%d]," % index)
+
+            code_str_list.append('=')
+            rd.shuffle(word_indices)
+            print(word_indices)
+            for index in word_indices:
+                code_str_list.append("sentence[%d]," % index)
+            code_str = ' '.join(code_str_list)
+            exec(code_str)
+    return paragraph
 
 
-def random_swap_tokens_in_word(sentence):
+def random_swap_tokens_in_word(paragraph):
 
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
+    '''
+    input pattern example (in error-sentences-token file):
+    [['BS', '.'], ['CKI', 'Nguyễn_Tiến_Dũng', ',', 'Trưởng', 'khoa', 'Khám_chữa', 'bệnh', 'theo', 'yêu_cầu', ',', 'Trưởng', 'đơn_nguyên', 'Phẫu_thuật', 'thần_kinh', 'BVĐK', 'tỉnh', 'cho', 'biết', ':', 'Cháu', 'Trung', 'vào', 'viện', 'trong', 'tình_trạng', 'vô_cùng', 'nguy_kịch', ',', 'phẫu_thuật', 'xử_trí', 'các', 'tổn_thương', 'cần', 'cẩn_trọng', 'và', 'tuyệt_đối', 'chính_xác', '.']]
+
+    pattern of return value same as input
+    '''
+
+    assert type(paragraph) is list, "input of random_swap_words_in_sentence func should be 2D list of tokens"
+
+    for sentence in paragraph:
+        for i in range(len(sentence)):
+            # sentence[i] = word
+            is_multi_syllables = True if '_' in sentence[i] else False
+            if is_multi_syllables:
+                if rd.randint(1, 3) == 1:
+                    syllables = sentence[i].split('_')
+                    if len(syllables) == 2:
+                        syllables[0], syllables[1] = syllables[1], syllables[0]
+                    else:
+                        rd.shuffle(syllables)
+                    sentence[i] = '_'.join(syllables)
+
+    return paragraph
 
 
-def random_insert_word_to_sentence(sentence):
+def random_insert_word_to_sentence(paragraph, word_list):
 
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
+    '''
+    input pattern example (in error-sentences-token file):
+    [['BS', '.'], ['CKI', 'Nguyễn_Tiến_Dũng', ',', 'Trưởng', 'khoa', 'Khám_chữa', 'bệnh', 'theo', 'yêu_cầu', ',', 'Trưởng', 'đơn_nguyên', 'Phẫu_thuật', 'thần_kinh', 'BVĐK', 'tỉnh', 'cho', 'biết', ':', 'Cháu', 'Trung', 'vào', 'viện', 'trong', 'tình_trạng', 'vô_cùng', 'nguy_kịch', ',', 'phẫu_thuật', 'xử_trí', 'các', 'tổn_thương', 'cần', 'cẩn_trọng', 'và', 'tuyệt_đối', 'chính_xác', '.']]
+
+    pattern of return value same as input
+    '''
+
+    assert type(paragraph) is list, "input of random_swap_words_in_sentence func should be 2D list of tokens"
+
+    for sentence in paragraph:
+
+        number_of_word_for_insert = len(sentence) // 7
+        words_for_insert = rd.sample(word_list, number_of_word_for_insert)
+        indices_for_insert = rd.sample(range(len(sentence)), number_of_word_for_insert)
+
+        for i in range(number_of_word_for_insert):
+            sentence.insert(indices_for_insert[i], words_for_insert[i])
+
+    return paragraph
 
 
 def random_replace_word_with_synonym(sentence):
-
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
+    pass
 
 
-def create_error_data()
+def create_error_data_with_tokenize_data(tokenize_data_path):
+    pass
+
+
+
+def create_error_data(corpus_path):
+    pass
+
+
 
 def analyse_data(corpus_path):
 

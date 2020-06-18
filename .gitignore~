@@ -143,5 +143,3 @@ ckpt/*
 *.vi
 data_generator/VnCoreNLP/*
 data_generator/ex.py
-corpus/errors/*
-corpus/corpus-full-0.2*
