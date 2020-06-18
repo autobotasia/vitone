@@ -136,10 +136,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-
-*.pyc
-ckpt/*
-*.vi
-data_generator/VnCoreNLP/*
-data_generator/ex.py
