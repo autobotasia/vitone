@@ -7,53 +7,33 @@ import re
 
 
 
-def random_delete_noun(sentence):
+def random_delete(paragraph):
 
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
+    '''
+    input pattern example (in error-sentences-token file):
 
+    [['BS', '.'], ['CKI', 'Nguyễn_Tiến_Dũng', ',', 'Trưởng', 'khoa', 'Khám_chữa', 'bệnh', 'theo', 'yêu_cầu', ',', 'Trưởng', 'đơn_nguyên', 'Phẫu_thuật', 'thần_kinh', 'BVĐK', 'tỉnh', 'cho', 'biết', ':', 'Cháu', 'Trung', 'vào', 'viện', 'trong', 'tình_trạng', 'vô_cùng', 'nguy_kịch', ',', 'phẫu_thuật', 'xử_trí', 'các', 'tổn_thương', 'cần', 'cẩn_trọng', 'và', 'tuyệt_đối', 'chính_xác', '.']]
 
-def random_delete_verb(sentence):
+    pattern of return value same as input
+    '''
 
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
+    for i in range(len(paragraph)):
 
+        sentence = paragraph[i]
+        number_of_words_to_delete = rd.randint(1, len(sentence) // 2 + 1)
+        index_of_random_words = set(rd.sample(range(len(sentence)), number_of_words_to_delete))
+        new_sentence = []
+        for j in range(len(sentence)):
+            if j in index_of_random_words:
+                continue
+            new_sentence.append(sentence[j])
+        paragraph[i] = new_sentence
+    new_paragraph = []
+    for element in paragraph:
+        if len(element) != 0:
+            new_paragraph.append(element)
 
-def random_delete_adj(sentence):
-
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
-
-
-def random_delete_modifier(sentence):
-
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
-
-
-def random_delete_subject(sentence):
-
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
-
-
-def random_delete_complement(sentence):
-
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
-
-
-def random_delete_noun(sentence):
-
-    # choose 10% sentences
-    if rd.randint(1, 10) == 1:
-        print("choose")
+    return new_paragraph
 
 
 def random_swap_words_in_sentence(paragraph):
