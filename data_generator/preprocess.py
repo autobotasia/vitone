@@ -4,10 +4,31 @@ import random as rd
 import pickle
 import os
 import re
+import ast
 
 
+def get_word_list(word_list_path):
 
-def random_delete(paragraph):
+    fi = open(word_list_path, 'r')
+    print("Open file word_list at %s ." % word_list_path)
+    word_list = [line.strip() for line in fi]
+    fi.close()
+    print("Close file word_list at %s ." % word_list_path)
+    return word_list
+
+
+def convert_list_to_string_type_paragraph(list_type_paragraph):
+
+    temp_paragraph = []
+    for list_type_sentence in list_type_paragraph:
+        string_type_sentence = ' '.join(list_type_sentence)
+        temp_paragraph.append(string_type_sentence)
+    string_type_paragraph = ' '.join(temp_paragraph)
+
+    return string_type_paragraph
+
+
+def random_delete_words(paragraph):
 
     '''
     input pattern example (in error-sentences-token file):
@@ -46,7 +67,7 @@ def random_swap_words_in_sentence(paragraph):
     '''
     assert type(paragraph) is list, "input of random_swap_words_in_sentence func should be 2D list of tokens"
 
-    print("choose paragraph of %s sentence to create error." % " ".join(paragraph[0]))
+    # print("choose paragraph of %s sentence to create error." % " ".join(paragraph[0]))
     for sentence in paragraph:
         number_of_words_for_swap_opr = len(sentence) // 6
         if number_of_words_for_swap_opr <= 1:
@@ -62,7 +83,7 @@ def random_swap_words_in_sentence(paragraph):
 
             code_str_list.append('=')
             rd.shuffle(word_indices)
-            print(word_indices)
+
             for index in word_indices:
                 code_str_list.append("sentence[%d]," % index)
             code_str = ' '.join(code_str_list)
@@ -124,14 +145,46 @@ def random_replace_word_with_synonym(sentence):
     pass
 
 
-def create_error_data_with_tokenize_data(tokenize_data_path):
-    pass
+def create_error_data(corpus_path, output_path, word_list_path):
 
+    """
+    create error data method.
 
+    input:
+            corpus_path
+            output_path
+            word_list_path
+    output:
+            error data
+    """
 
-def create_error_data(corpus_path):
-    pass
+    fi = open(corpus_path, 'r')
+    print("Open %s corpus file for create error data." % corpus_path)
+    word_list = get_word_list(word_list_path)
+    fo = open(output_path, 'w')
 
+    str_code = [
+        "if do_random_swap_tokens_in_word: random_swap_tokens_in_word(paragraph)",
+        "if do_random_swap_words_in_sentence: random_swap_words_in_sentence(paragraph)",
+        "if do_random_delete_words: random_delete_words(paragraph)",
+        "if do_random_insert_word_to_sentence: random_insert_word_to_sentence(paragraph, word_list)",
+    ]
+    choose_str_code = [0, 1, 2, 3]
+
+    for line in fi:
+        paragraph = ast.literal_eval(line.strip())
+        do_random_swap_tokens_in_word = (rd.random() <= 0.73) # choose 10%
+        do_random_swap_words_in_sentence = (rd.random() <= 0.73)
+        do_random_delete_words = (rd.random() <= 0.73)
+        do_random_insert_word_to_sentence = (rd.random() <= 0.73)
+        rd.shuffle(choose_str_code)
+        for index in choose_str_code:
+            exec(str_code[index])
+        string_paragraph = convert_list_to_string_type_paragraph(paragraph)
+        fo.write(str(string_paragraph) + '\n')
+
+    fi.close()
+    fo.close()
 
 
 def analyse_data(corpus_path):
@@ -158,17 +211,9 @@ def analyse_data(corpus_path):
 
         fi = open(corpus_path, 'r')
         fo_token = open(output_data_folder_path + corpus_filename + '-token', 'w')
-        fo_pos_tag = open(output_data_folder_path + corpus_filename + '-postag', 'w')
-        fo_ner = open(output_data_folder_path + corpus_filename + '-ner', 'w')
-        fo_dep_parse = open(output_data_folder_path + corpus_filename + '-dep-parse', 'w')
-        fo_anno = open(output_data_folder_path + corpus_filename + '-anno', 'w')
-
         print("Open %s" % corpus_path)
         print("Open %s" % fo_token.name)
-        print("Open %s" % fo_pos_tag.name)
-        print("Open %s" % fo_ner.name)
-        print("Open %s" % fo_dep_parse.name)
-        print("Open %s" % fo_anno.name)
+
 
         line_number = 0
         for line in fi:
@@ -181,10 +226,6 @@ def analyse_data(corpus_path):
 
             sentences = fi.readline()
             fo_token.write(str(vncorenlp.tokenize(sentences)) + '\n')
-            fo_pos_tag.write(str(vncorenlp.pos_tag(sentences)) + '\n')
-            fo_ner.write(str(vncorenlp.ner(sentences)) + '\n')
-            fo_dep_parse.write(str(vncorenlp.dep_parse(sentences)) + '\n')
-            fo_anno.write(str(vncorenlp.annotate(sentences)) + '\n')
 
         print('Finish analysis data.')
 
@@ -193,17 +234,9 @@ def analyse_data(corpus_path):
     finally:
         fi.close()
         fo_token.close()
-        fo_pos_tag.close()
-        fo_ner.close()
-        fo_dep_parse.close()
-        fo_anno.close()
 
         print("Close %s" % corpus_path)
         print("Close %s" % fo_token.name)
-        print("Close %s" % fo_pos_tag.name)
-        print("Close %s" % fo_ner.name)
-        print("Close %s" % fo_dep_parse.name)
-        print("Close %s" % fo_anno.name)
 
     return output_data_folder_path
 
@@ -264,6 +297,10 @@ def random_select_sentence_for_create_error_sentences(fi_path, fo_path):
 if __name__ == '__main__':
 
     print("Start main func.")
+    word_list_path = "../data/word_list"
+    corpus_path = '/media/neil-do/SSDIntersection/NCC/ViTone/vitone/corpus/errors/output-data/mini-corpus-error-sentences-token'
+    output_path = '../corpus/errors/mini-corpus-error-sentences'
+    create_error_data(corpus_path, output_path, word_list_path)
+    print("Finish all tasks.")
     # fo_path, fo_line_index_path = random_select_sentence_for_create_error_sentences('../corpus/mini-corpus', '../corpus/errors/mini-corpus-error-sentences')
-    fo_path = '../corpus/errors/mini-corpus-error-sentences'
     # analyse_data(fo_path)
